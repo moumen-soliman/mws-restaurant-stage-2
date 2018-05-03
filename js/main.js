@@ -38,3 +38,70 @@ fillNeighborhoodsHTML = (neighborhoods = self.neighborhoods) => {
     select.append(option);
   });
 }
+
+/**
+ * Fetch all cuisines and set their HTML.
+ */
+fetchCuisines = () => {
+  DBHelper.fetchCuisines((error, cuisines) => {
+    if (error) { // Got an error!
+      console.error(error);
+    } else {
+      self.cuisines = cuisines;
+      fillCuisinesHTML();
+    }
+  });
+}
+
+/**
+ * Set cuisines HTML.
+ */
+fillCuisinesHTML = (cuisines = self.cuisines) => {
+  const select = document.getElementById('cuisines-select');
+
+  cuisines.forEach(cuisine => {
+    const option = document.createElement('option');
+    option.innerHTML = cuisine;
+    option.value = cuisine;
+    select.append(option);
+  });
+}
+
+/**
+ * Initialize Google map, called from HTML.
+ */
+window.initMap = () => {
+  let loc = {
+    lat: 40.722216,
+    lng: -73.987501
+  };
+  self.map = new google.maps.Map(document.getElementById('map'), {
+    zoom: 12,
+    center: loc,
+    scrollwheel: false
+  });
+  updateRestaurants();
+}
+
+/**
+ * Update page and map for current restaurants.
+ */
+updateRestaurants = () => {
+  const cSelect = document.getElementById('cuisines-select');
+  const nSelect = document.getElementById('neighborhoods-select');
+
+  const cIndex = cSelect.selectedIndex;
+  const nIndex = nSelect.selectedIndex;
+
+  const cuisine = cSelect[cIndex].value;
+  const neighborhood = nSelect[nIndex].value;
+
+  DBHelper.fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, (error, restaurants) => {
+    if (error) { // Got an error!
+      console.error(error);
+    } else {
+      resetRestaurants(restaurants);
+      fillRestaurantsHTML();
+    }
+  })
+}
