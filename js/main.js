@@ -105,3 +105,77 @@ updateRestaurants = () => {
     }
   })
 }
+
+/**
+ * Clear current restaurants, their HTML and remove their map markers.
+ */
+resetRestaurants = (restaurants) => {
+  // Remove all restaurants
+  self.restaurants = [];
+  const ul = document.getElementById('restaurants-list');
+  ul.innerHTML = '';
+
+  // Remove all map markers
+  self.markers.forEach(m => m.setMap(null));
+  self.markers = [];
+  self.restaurants = restaurants;
+}
+
+/**
+ * Create all restaurants HTML and add them to the webpage.
+ */
+fillRestaurantsHTML = (restaurants = self.restaurants) => {
+  const ul = document.getElementById('restaurants-list');
+  restaurants.forEach(restaurant => {
+    ul.append(createRestaurantHTML(restaurant));
+  });
+  addMarkersToMap();
+}
+
+/**
+ * Create restaurant HTML.
+ */
+createRestaurantHTML = (restaurant) => {
+  const li = document.createElement('li');
+
+  const image = document.createElement('img');
+  image.className = 'restaurant-img';
+  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.setAttribute('alt','Picture of restaurant ' + restaurant.name);
+  li.append(image);
+
+  const name = document.createElement('h2');
+  name.innerHTML = restaurant.name;
+  li.append(name);
+
+  const neighborhood = document.createElement('p');
+  neighborhood.innerHTML = restaurant.neighborhood;
+  li.append(neighborhood);
+
+  const address = document.createElement('p');
+  address.innerHTML = restaurant.address;
+  li.append(address);
+
+  const more = document.createElement('a');
+  more.innerHTML = 'View Details';
+  more.href = DBHelper.urlForRestaurant(restaurant);
+  more.setAttribute('role', 'button');
+  more.setAttribute('aria-label','View detail of restaurant '+restaurant.name);
+  li.append(more)
+
+  return li
+}
+
+/**
+ * Add markers for current restaurants to the map.
+ */
+addMarkersToMap = (restaurants = self.restaurants) => {
+  restaurants.forEach(restaurant => {
+    // Add marker to the map
+    const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
+    google.maps.event.addListener(marker, 'click', () => {
+      window.location.href = marker.url
+    });
+    self.markers.push(marker);
+  });
+}
