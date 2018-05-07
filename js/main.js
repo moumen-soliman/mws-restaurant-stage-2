@@ -1,13 +1,13 @@
 let restaurants,
   neighborhoods,
-  cuisines
-var map
-var markers = []
+  cuisines;
+var map;
+var markers = [];
 
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
-document.addEventListener('DOMContentLoaded', (event) => {
+document.addEventListener('DOMContentLoaded', () => {
   fetchNeighborhoods();
   fetchCuisines();
 });
@@ -141,10 +141,20 @@ createRestaurantHTML = (restaurant) => {
   const image = document.createElement('img');
   image.className = 'restaurant-img';
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
-  image.setAttribute('alt','Picture of restaurant ' + restaurant.name);
+  image.alt = `showing photo of ${restaurant.name}`;
+
+  // add JS responsive image using matchMedia addListener
+  const mq_tablet = window.matchMedia("(min-width: 450px)");
+  mq_tablet.addListener(mq => {
+    if (mq.matches) {
+      return image.src = (`/img/desktop/${restaurant.photograph}.jpg`);
+    } else {
+      return image.src = (`/img/tablet/${restaurant.photograph}.jpg`);
+    }
+  });
   li.append(image);
 
-  const name = document.createElement('h2');
+  const name = document.createElement('h1');
   name.innerHTML = restaurant.name;
   li.append(name);
 
@@ -159,9 +169,7 @@ createRestaurantHTML = (restaurant) => {
   const more = document.createElement('a');
   more.innerHTML = 'View Details';
   more.href = DBHelper.urlForRestaurant(restaurant);
-  more.setAttribute('role', 'button');
-  more.setAttribute('aria-label','View detail of restaurant '+restaurant.name);
-  li.append(more)
+  li.append(more);
 
   return li
 }
@@ -180,16 +188,16 @@ addMarkersToMap = (restaurants = self.restaurants) => {
   });
 }
 
+/**
+ * Register service worker
+ */
 if ('serviceWorker' in navigator) {
-    // Register a service worker hosted at the root of the
-    // site using the default scope.
-    //https://developers.google.com/web/fundamentals/primers/service-workers/?hl=es
-    navigator.serviceWorker.register('./js/sw.js')
-        .then(function(registration) {
-            console.log('Service worker registration succeeded:', registration);
-        }).catch(function(error) {
-        console.log('Service worker registration failed:', error);
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js', {scope: '/'})
+      .then(res => {
+        console.log('sw has been registered')
+      }).catch(err => {
+      console.log('sw registration fails')
     });
-} else {
-    console.log('Service workers are not supported.');
+  });
 }

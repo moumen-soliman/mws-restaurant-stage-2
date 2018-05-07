@@ -8,33 +8,37 @@ class DBHelper {
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 8000 // Change this to your server port
-    const isDevModeOn = true;
-    let url=`http://localhost:${port}/`;
-    if(isDevModeOn){
-      url=window.location;
-    } 
-    url+=`data/restaurants.json`  
-    return url;
+    const port = 1337; // Change this to your server port
+    return `http://localhost:${port}/restaurants`;
   }
 
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    let xhr = new XMLHttpRequest();
-    xhr.open('GET', DBHelper.DATABASE_URL);
-    xhr.onload = () => {
-      if (xhr.status === 200) { // Got a success response from server!
-        const json = JSON.parse(xhr.responseText);
-        const restaurants = json.restaurants;
-        callback(null, restaurants);
-      } else { // Oops!. Got an error from server.
-        const error = (`Request failed. Returned status of ${xhr.status}`);
-        callback(error, null);
-      }
-    };
-    xhr.send();
+    if (navigator.onLine) {
+      // delete old, create new idb and populate data when online
+      IDBHelper.deleteOldDatabase();
+      IDBHelper.createNewDatabase();
+      IDBHelper.populateDatabase(IDBHelper.dbPromise);
+      console.log('data from xhr');
+      let xhr = new XMLHttpRequest();
+      xhr.open('GET', DBHelper.DATABASE_URL);
+      xhr.onload = () => {
+        if (xhr.status === 200) { // Got a success response from server!
+          const json = JSON.parse(xhr.responseText);
+          callback(null, json);
+        } else { // Oops!. Got an error from server.
+          const error = (`Request failed. Returned status of ${xhr.status}`);
+          callback(error, null);
+        }
+      };
+      xhr.send();
+    } else {
+      console.log('data from idb');
+      IDBHelper.readAllIdbData(IDBHelper.dbPromise)
+        .then(restaurants => { return callback(null, restaurants) });
+    }
   }
 
   /**
@@ -156,7 +160,16 @@ class DBHelper {
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`./img/${restaurant.photograph}`);
+    const mq_tablet = window.matchMedia("(min-width: 450px)");
+    const mq_desktop = window.matchMedia("(min-width: 800px)");
+
+    if (mq_desktop.matches) {
+      return (`/img/desktop/${restaurant.photograph}.jpg`);
+    } else if (mq_tablet.matches) {
+      return (`/img/tablet/${restaurant.photograph}.jpg`);
+    } else {
+      return (`/img/mobile/${restaurant.photograph}.jpg`);
+    }
   }
 
   /**

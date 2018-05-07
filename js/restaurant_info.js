@@ -57,8 +57,20 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
 
   const image = document.getElementById('restaurant-img');
   image.className = 'restaurant-img';
-  image.setAttribute('alt','Picture of restaurant ' + restaurant.name);
   image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  image.alt = `showing photo of ${restaurant.name}`;
+
+  // add JS responsive image using matchMedia addListener
+  const mq_tablet = window.matchMedia("(min-width: 450px)");
+  mq_tablet.addListener(mq => {
+    if (mq.matches) {
+      console.log("above 450px");
+      return image.src = (`/img/desktop/${restaurant.photograph}.jpg`);
+    } else {
+      console.log('smaller than 450px')
+      return image.src = (`/img/tablet/${restaurant.photograph}.jpg`);
+    }
+  });
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
@@ -161,4 +173,18 @@ getParameterByName = (name, url) => {
   if (!results[2])
     return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+/**
+ * Register service worker
+ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js', {scope: '/'})
+      .then(res => {
+        console.log('sw has been registered')
+      }).catch(err => {
+      console.log('sw registration fails')
+    });
+  });
 }

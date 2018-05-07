@@ -2,45 +2,55 @@
 <html lang="en">
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#f18200" />
   <link rel="stylesheet" src="//normalize-css.googlecode.com/svn/trunk/normalize.css" />
-  <link rel="stylesheet" href="css/styles.css">
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="css/styles.css" media="screen" >
+  <link rel="stylesheet" type="text/css" href="css/styles-tablet.css" media="screen and (min-width:450px)">
+  <link rel="stylesheet" type="text/css" href="css/styles-desktop.css" media="screen and (min-width:800px)">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" type="image/png" href="img/icons/shop_512.png"/>
   <title>Restaurant Reviews</title>
 </head>
 
 <body>
-  <header>
+  <header role="banner">
     <nav>
-      <h1><a href="/" aria-label="Restaurants Reviews link">Restaurant Reviews</a></h1>
+      <h1><a href="/">Restaurant Reviews</a></h1>
     </nav>
   </header>
 
-  <main id="maincontent">
-    <section id="map-container" aria-label="Interactive restaurant location map" role="application">
-      <div id="map"></div>
+  <main id="maincontent" role="main">
+    <section id="map-container">
+      <div id="map" role="application" aria-label="restaurants map"></div>
     </section>
     <section>
-      <div class="filter-options" aria-label="Filter options">
-        <h2>Filter Results</h2>
-        <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()" aria-label="Filter by neighborhoud">
+      <div class="filter-options">
+        <h2>Filter Results
+        <br />
+        <br />
+        <label for="neighborhoods-select">Select Neighbor: </label>
+        <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()" autofocus>
           <option value="all">All Neighborhoods</option>
         </select>
-        <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()" aria-label="Filter by cuisine type">
+        <label for="cuisines-select">Select Cuisine: </label>
+        <select id="cuisines-select" name="cuisines" onchange="updateRestaurants()">
           <option value="all">All Cuisines</option>
         </select>
       </div>
-      <ul id="restaurants-list" aria-label="List of restaurants" role="contentinfo"></ul>
+      <ul id="restaurants-list"></ul>
     </section>
   </main>
 
-  <script type="application/javascript" charset="utf-8" src="js/dbhelper.js"></script>
-  <script type="application/javascript" charset="utf-8" src="js/main.js"></script>
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAeYGklucZIufse0mnqyOBmZlycsMnlTUQ&libraries=places&callback=initMap"></script>
+  <script type="application/javascript" charset="utf-8" src="/js/idb.js"></script>
+  <script type="application/javascript" charset="utf-8" src="/js/idbhelper.js"></script>
+  <script type="application/javascript" charset="utf-8" src="/js/dbhelper.js"></script>
+  <script type="application/javascript" charset="utf-8" src="/js/main.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnBSuoy63BVBmMAbnx0B5i98fsvCZZT94&libraries=places&callback=initMap"></script>
 
 
-  <footer id="footer">
-    Copyright (c) 2017 <a href="/" aria-label="Restaurants Reviews link"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
+  <footer id="footer" role="contentinfo">
+    Copyright (c) 2017 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
   </footer>
 
 </body>
